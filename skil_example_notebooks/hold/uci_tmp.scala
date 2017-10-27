@@ -59,7 +59,7 @@ import java.io.FileWriter
 import java.io.PrintStream
 import java.io.Serializable
 import java.net.URL
-import java.util.*
+import java.util._
 
 import scala.beans.{BeanProperty, BooleanBeanProperty}
 import scala.collection.JavaConversions._
@@ -302,7 +302,7 @@ private class BatchDataSetsFunction(private val minibatchSize: Int)
       exist = baseDir.exists()
     }
     if (exist) {
-      out.println(dataPath + " exist!!")
+      println(dataPath + " exist!!")
 //Data already exists, don't download it again
       return
     }
@@ -504,10 +504,10 @@ private class BatchDataSetsFunction(private val minibatchSize: Int)
     for (i <- 0 until nEpochs) {
       model = sparkNet.fit(trainRDD)
       val evaluationt: Evaluation = sparkNet.evaluate(trainRDD)
-      out.println(
+      println(
         String.format(str, "tr", i, evaluationt.accuracy(), evaluationt.f1()))
       val evaluation: Evaluation = sparkNet.evaluate(testRDD)
-      out.println(
+      println(
         String.format(str, "te", i, evaluation.accuracy(), evaluation.f1()))
       testEvals.add(evaluation)
     }
@@ -518,10 +518,10 @@ private class BatchDataSetsFunction(private val minibatchSize: Int)
         "SparkStats_" + System.currentTimeMillis() + ".html",
         sc)
     }
-    out.println("----- Example Complete -----")
+    println("----- Example Complete -----")
     val locationToSave: File = new File(modelPath)
     ModelSerializer.writeModel(model, locationToSave, saveUpdater)
-    out.printf("---- Saved model to: %s -----\n", locationToSave)
+    printf("---- Saved model to: %s -----\n", locationToSave)
     val finalEval: Evaluation = sparkNet.evaluate(testRDD)
     val result: ModelWithEval = new ModelWithEval(
       model,
