@@ -44,8 +44,8 @@ import org.deeplearning4j.util.ModelSerializer
 import org.nd4j.linalg.activations.Activation
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.dataset.DataSet
-import org.nd4j.linalg.dataset.api.preprocessor.SparkDataNormalization
-import org.nd4j.linalg.dataset.api.preprocessor.SparkNormalizerStandardize
+//import org.nd4j.linalg.dataset.api.preprocessor.SparkDataNormalization
+//import org.nd4j.linalg.dataset.api.preprocessor.SparkNormalizerStandardize
 import org.nd4j.linalg.factory.Nd4j
 import org.nd4j.linalg.indexing.INDArrayIndex
 import org.nd4j.linalg.indexing.NDArrayIndex
@@ -65,28 +65,64 @@ import scala.beans.{BeanProperty, BooleanBeanProperty}
 import scala.collection.JavaConversions._
 
 
+/*
 trait SparkDataSetPreProcessor extends Serializable {
 
   def preProcess(toPreProcess: JavaRDD[DataSet]): JavaRDD[DataSet]
 
 }
+*/
+import org.apache.spark.rdd._
+import org.apache.spark.rdd.RDD
+//import org.apache.spark.rdd.RDD
+//import org.nd4j.linalg.dataset.DataSet
+import org.nd4j.linalg.dataset.DataSet
 
+trait SparkDataSetPreProcessor extends Serializable {
+
+    import org.apache.spark.rdd.RDD
+    import org.nd4j.linalg.dataset.DataSet
+
+
+  def preProcess(toPreProcess: RDD[DataSet]): RDD[DataSet]
+   // def preProcess(toPreProcess: RDD[String]): RDD[String]
+  //def preProcess(toPreProcess: DataSet): DataSet
+
+}
 
 trait SparkDataNormalization extends SparkDataSetPreProcessor {
 
-  def fit(dataRDD: JavaRDD[DataSet]): Unit
+    import org.apache.spark.rdd.RDD
+    import org.nd4j.linalg.dataset.DataSet
+
+  def fit(dataRDD: RDD[DataSet]): Unit
 
 }
 
 
-
 class SparkNormalizerStandardize extends SparkDataNormalization {
+
+    import org.nd4j.linalg.api.ndarray.INDArray
+    import org.apache.spark.rdd.RDD
+    import org.nd4j.linalg.dataset.DataSet
+    import org.apache.spark.api.java.function.FlatMapFunction
+    
+    import java.io.File
+    import java.io.FileWriter
+    import java.io.PrintStream
+    import java.io.Serializable
+    import java.net.URL
+    import java.util._
+    
+    import scala.beans.{BeanProperty, BooleanBeanProperty}
+    import scala.collection.JavaConversions._
+
 
   private var featureMean: INDArray = _
 
   private var featureStd: INDArray = _
 
-  override def preProcess(toPreProcess: JavaRDD[DataSet]): JavaRDD[DataSet] = {
+  override def preProcess(toPreProcess: RDD[DataSet]): RDD[DataSet] = {
     val mean: INDArray = this.featureMean
     val std: INDArray = this.featureStd
     if (this.featureMean == null) {
@@ -116,7 +152,7 @@ class SparkNormalizerStandardize extends SparkDataNormalization {
     }
   }
 
-  override def fit(dataRDD: JavaRDD[DataSet]): Unit = {
+  override def fit(dataRDD: RDD[DataSet]): Unit = {
     val doubleRDD: JavaDoubleRDD =
       dataRDD.flatMapToDouble(new DoubleFlatMapFunction[DataSet]() {
         override def call(dataSet: DataSet): java.lang.Iterable[Double] = {
