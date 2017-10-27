@@ -65,17 +65,19 @@ import scala.beans.{BeanProperty, BooleanBeanProperty}
 import scala.collection.JavaConversions._
 
 
+trait SparkDataSetPreProcessor extends Serializable {
+
+  def preProcess(toPreProcess: JavaRDD[DataSet]): JavaRDD[DataSet]
+
+}
+
+
 trait SparkDataNormalization extends SparkDataSetPreProcessor {
 
   def fit(dataRDD: JavaRDD[DataSet]): Unit
 
 }
 
-trait SparkDataSetPreProcessor extends Serializable {
-
-  def preProcess(toPreProcess: JavaRDD[DataSet]): JavaRDD[DataSet]
-
-}
 
 
 class SparkNormalizerStandardize extends SparkDataNormalization {
