@@ -38,7 +38,7 @@ import java.util.Random
 // download dataset function -----
 
 
-  private def downloadUCIData(): Unit = {
+  def downloadUCIData() {
 //Data already exists
     if (baseDir.exists()) return
     val url: String =
