@@ -1,13 +1,37 @@
-import org.deeplearning4j.nn.api.OptimizationAlgorithm
-import org.deeplearning4j.nn.conf.graph.MergeVertex
-import org.deeplearning4j.nn.conf.layers.{DenseLayer, GravesLSTM, OutputLayer, RnnOutputLayer}
-import org.deeplearning4j.nn.conf.{ComputationGraphConfiguration, MultiLayerConfiguration, NeuralNetConfiguration, Updater}
-import org.deeplearning4j.nn.graph.ComputationGraph
-import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
-import org.deeplearning4j.nn.weights.WeightInit
+
+import io.skymind.zeppelin.utils._
+import io.skymind.modelproviders.history.client.ModelHistoryClient
+import io.skymind.modelproviders.history.model._
+import org.deeplearning4j.datasets.iterator._
+import org.deeplearning4j.datasets.iterator.impl._
+import org.deeplearning4j.nn.api._
+import org.deeplearning4j.nn.multilayer._
+import org.deeplearning4j.nn.graph._
+import org.deeplearning4j.nn.conf._
+import org.deeplearning4j.nn.conf.inputs._
+import org.deeplearning4j.nn.conf.layers._
+import org.deeplearning4j.nn.conf.layers._
+import org.deeplearning4j.nn.weights._
+import org.deeplearning4j.optimize.listeners._
+import org.deeplearning4j.api.storage.impl.RemoteUIStatsStorageRouter
+import org.deeplearning4j.ui.stats.StatsListener
+import org.datavec.api.transform._
 import org.nd4j.linalg.activations.Activation
-import org.nd4j.linalg.learning.config.Nesterovs
-import org.nd4j.linalg.lossfunctions.LossFunctions
+import org.nd4j.linalg.learning.config._
+import org.nd4j.linalg.lossfunctions.LossFunctions._
+import org.nd4j.linalg.factory.Nd4j
+
+
+//import org.deeplearning4j.nn.api.OptimizationAlgorithm
+//import org.deeplearning4j.nn.conf.graph.MergeVertex
+//import org.deeplearning4j.nn.conf.layers.{DenseLayer, GravesLSTM, OutputLayer, RnnOutputLayer}
+//import org.deeplearning4j.nn.conf.{ComputationGraphConfiguration, MultiLayerConfiguration, NeuralNetConfiguration, Updater}
+//import org.deeplearning4j.nn.graph.ComputationGraph
+//import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
+//import org.deeplearning4j.nn.weights.WeightInit
+//import org.nd4j.linalg.activations.Activation
+//import org.nd4j.linalg.learning.config.Nesterovs
+//import org.nd4j.linalg.lossfunctions.LossFunctions
 
 
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator
