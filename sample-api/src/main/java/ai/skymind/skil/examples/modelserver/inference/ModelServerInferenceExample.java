@@ -46,7 +46,7 @@ public class ModelServerInferenceExample {
     @Parameter(names="--knn", description="Number of K Nearest Neighbors to return", required=false)
     private int knnN = 20;
 
-    @Parameter(names="--textAsJson", description="Parse text/plain as JSON", required=false)
+    @Parameter(names="--textAsJson", description="Parse text/plain as JSON", required=false, arity=1)
     private boolean textAsJson;
 
     public void run() throws Exception {

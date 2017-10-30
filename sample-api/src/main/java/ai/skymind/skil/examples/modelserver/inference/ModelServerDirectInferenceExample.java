@@ -32,7 +32,7 @@ public class ModelServerDirectInferenceExample {
     @Parameter(names = "--sequential", description = "If this transform a sequential one", required = false)
     private boolean isSequential = false;
 
-    @Parameter(names = "--textAsJson", description = "Parse text/plain as JSON", required = false)
+    @Parameter(names = "--textAsJson", description = "Parse text/plain as JSON", required = false, arity = 1)
     private boolean textAsJson = true;
 
     public void run() throws Exception {
