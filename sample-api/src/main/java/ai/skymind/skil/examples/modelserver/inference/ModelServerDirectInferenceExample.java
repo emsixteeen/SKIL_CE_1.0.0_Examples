@@ -32,8 +32,8 @@ public class ModelServerDirectInferenceExample {
     @Parameter(names = "--sequential", description = "If this transform a sequential one", required = false)
     private boolean isSequential = false;
 
-    @Parameter(names = "--418", description = "Temp Fix for DataVec#418", required = false)
-    private boolean fix418;
+    @Parameter(names = "--textAsJson", description = "Parse text/plain as JSON", required = false)
+    private boolean textAsJson = true;
 
     public void run() throws Exception {
         final File file = new File(inputFile);
@@ -76,6 +76,12 @@ public class ModelServerDirectInferenceExample {
                         new int[]{0, i};
 
                 array.putScalar(idx, d);
+            }
+
+            if (textAsJson) {
+                List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
+                converters.add(new ExtendedMappingJackson2HttpMessageConverter());
+                restTemplate.setMessageConverters(converters);
             }
 
             Inference.Request request = new Inference.Request(Nd4jBase64.base64String(array));
