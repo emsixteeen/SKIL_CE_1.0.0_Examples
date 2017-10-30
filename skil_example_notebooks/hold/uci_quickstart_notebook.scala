@@ -200,9 +200,9 @@ val client = skilContext.client
       .pretrain(false)
       .backprop(true)
       .build()
-    val net: MultiLayerNetwork = new MultiLayerNetwork(conf)
-    net.init()
-    net.setListeners(new ScoreIterationListener(20))
+    val network_model: MultiLayerNetwork = new MultiLayerNetwork(conf)
+    network_model.init()
+    //net.setListeners(new ScoreIterationListener(20))
 
 
 
@@ -213,13 +213,19 @@ val client = skilContext.client
     val str: String =
       "Test set evaluation at epoch %d: Accuracy = %.2f, F1 = %.2f"
     for (i <- 0 until nEpochs) {
-      net.fit(trainData)
+      network_model.fit(trainData)
 //Evaluate on the test set:
-      val evaluation: Evaluation = net.evaluate(testData)
+      val evaluation: Evaluation = network_model.evaluate(testData)
       println(String.format(str, i, evaluation.accuracy(), evaluation.f1()))
       testData.reset()
       trainData.reset()
     }
+
+
+val evaluation = network_model.evaluate(testData)
+
+val modelId = skilContext.addModelToExperiment(z, network_model)
+val evalId = skilContext.addEvaluationToModel(z, modelId, evaluation)
 
 
 
