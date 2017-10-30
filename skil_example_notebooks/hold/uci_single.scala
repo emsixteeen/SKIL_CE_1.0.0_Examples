@@ -161,10 +161,10 @@ import java.util.Random
       .list()
       .layer(
         0,
-        new GravesLSTM.Builder().activation("tanh").nIn(1).nOut(10).build())
+        new GravesLSTM.Builder().activation(Activation.TANH).nIn(1).nOut(10).build())
       .layer(1,
-             new RnnOutputLayer.Builder(LossFunctions.LossFunction.MCXENT)
-               .activation("softmax")
+             new RnnOutputLayer.Builder(LossFunction.MCXENT)
+               .activation(Activation.SOFTMAX)
                .nIn(10)
                .nOut(numLabelClasses)
                .build())
