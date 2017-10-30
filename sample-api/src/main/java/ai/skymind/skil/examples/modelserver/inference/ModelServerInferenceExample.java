@@ -1,8 +1,8 @@
 package ai.skymind.skil.examples.modelserver.inference;
 
-import ai.skymind.cdg.api.model.Knn;
-import ai.skymind.cdg.api.model.Inference;
-import ai.skymind.cdg.api.model.TransformedArray;
+import ai.skymind.skil.examples.modelserver.inference.model.Knn;
+import ai.skymind.skil.examples.modelserver.inference.model.Inference;
+import ai.skymind.skil.examples.modelserver.inference.model.TransformedArray;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
