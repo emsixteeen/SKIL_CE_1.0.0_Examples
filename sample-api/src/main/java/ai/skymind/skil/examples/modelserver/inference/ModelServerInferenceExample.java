@@ -139,11 +139,3 @@ public class ModelServerInferenceExample {
         m.run();
     }
 }
-
-class ExtendedMappingJackson2HttpMessageConverter extends MappingJackson2HttpMessageConverter {
-    public ExtendedMappingJackson2HttpMessageConverter() {
-        List<MediaType> types = new ArrayList<MediaType>(super.getSupportedMediaTypes());
-        types.add(new MediaType("text", "plain", DEFAULT_CHARSET));
-        super.setSupportedMediaTypes(types);
-    }
-}
