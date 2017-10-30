@@ -91,7 +91,7 @@ public class ModelServerDirectInferenceExample {
     }
 
     public static void main(String[] args) throws Exception {
-        ModelServerInferenceExample m = new ModelServerInferenceExample();
+        ModelServerDirectInferenceExample m = new ModelServerDirectInferenceExample();
         JCommander.newBuilder()
                 .addObject(m)
                 .build()
