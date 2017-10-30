@@ -1,16 +1,11 @@
 package ai.skymind.skil.examples.modelserver.inference;
 
 import ai.skymind.skil.examples.modelserver.inference.model.Inference;
-import ai.skymind.skil.examples.modelserver.inference.model.Knn;
-import ai.skymind.skil.examples.modelserver.inference.model.TransformedArray;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.serde.base64.Nd4jBase64;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,7 +13,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.List;
 
 public class ModelServerDirectInferenceExample {
