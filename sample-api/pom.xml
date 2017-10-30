@@ -12,6 +12,7 @@
         <junit.version>4.12</junit.version>
         <nd4j.artifact>nd4j-native</nd4j.artifact>
         <nd4j.version>0.9.1</nd4j.version>
+        <main.class>ai.skymind.skil.examples.modelserver.inference.ModelServerInferenceExample</main.class>
     </properties>
 
     <dependencies>
@@ -67,10 +68,22 @@
                         <goals>
                             <goal>repackage</goal>
                         </goals>
+                        <configuration>
+                            <mainClass>${main.class}</mainClass>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>directInference</id>
+            <properties>
+                <main.class>ai.skymind.skil.examples.modelserver.inference.ModelServerDirectInferenceExample</main.class>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
