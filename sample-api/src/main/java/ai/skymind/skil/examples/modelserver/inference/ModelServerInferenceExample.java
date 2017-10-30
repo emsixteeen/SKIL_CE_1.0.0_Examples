@@ -46,8 +46,8 @@ public class ModelServerInferenceExample {
     @Parameter(names="--knn", description="Number of K Nearest Neighbors to return", required=false)
     private int knnN = 20;
 
-    @Parameter(names="--418", description="Temp Fix for DataVec#418", required=false)
-    private boolean fix418;
+    @Parameter(names="--textAsJson", description="Parse text/plain as JSON", required=false)
+    private boolean textAsJson;
 
     public void run() throws Exception {
         final File file = new File(inputFile);
@@ -86,7 +86,7 @@ public class ModelServerInferenceExample {
                 transformRequest = new TransformedArray.Request(fields);
             }
 
-            if (fix418) {
+            if (textAsJson) {
                 // Accept JSON
                 requestHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
