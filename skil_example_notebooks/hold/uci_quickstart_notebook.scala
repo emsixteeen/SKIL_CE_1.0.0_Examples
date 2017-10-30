@@ -180,9 +180,10 @@ val client = skilContext.client
     val conf: MultiLayerConfiguration = new NeuralNetConfiguration.Builder()
       .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
       .iterations(1)
-      .updater(Updater.NESTEROVS)
-      .momentum(0.9)
-      .learningRate(0.005)
+      //.updater(Updater.NESTEROVS)
+      .updater(new Nesterovs(0.006, 0.9)
+//      .momentum(0.9)
+//      .learningRate(0.005)
       .gradientNormalization(
         GradientNormalization.ClipElementWiseAbsoluteValue)
       .gradientNormalizationThreshold(0.5)
