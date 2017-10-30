@@ -180,7 +180,7 @@ import java.util.Random
 
     // ###### Train Network  ######
 // ----- Train the network, evaluating the test set performance at each step -----
-    val nEpochs: Int = 40
+    val nEpochs: Int = 2
     val str: String =
       "Test set evaluation at epoch %d: Accuracy = %.2f, F1 = %.2f"
     for (i <- 0 until nEpochs) {
