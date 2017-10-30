@@ -10,6 +10,8 @@
     <properties>
         <java.version>1.8</java.version>
         <junit.version>4.12</junit.version>
+        <nd4j.artifact>nd4j-native</nd4j.artifact>
+        <nd4j.version>0.9.1</nd4j.version>
     </properties>
 
     <dependencies>
@@ -33,7 +35,16 @@
             <artifactId>jcommander</artifactId>
             <version>1.72</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>${nd4j.artifact}</artifactId>
+            <version>${nd4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-base64</artifactId>
+            <version>${nd4j.version}</version>
+        </dependency>
         <!-- Tests -->
         <dependency>
             <groupId>junit</groupId>
