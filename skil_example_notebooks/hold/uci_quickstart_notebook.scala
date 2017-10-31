@@ -145,7 +145,6 @@ val trainData: MultiDataSetIterator = new RecordReaderMultiDataSetIterator.Build
     .addReader("labels", trainLabels)
     .addInput("features")
     .addOutputOneHot("labels", 0, numLabelClasses)
-    .sequenceAlignmentMode(RecordReaderMultiDataSetIterator.AlignmentMode.ALIGN_END)
     .build()
 
 // Normalize the training data
@@ -179,7 +178,6 @@ val testData: MultiDataSetIterator = new RecordReaderMultiDataSetIterator.Builde
     .addReader("labels", trainLabels)
     .addInput("features")
     .addOutputOneHot("labels", 0, numLabelClasses)
-    .sequenceAlignmentMode(RecordReaderMultiDataSetIterator.AlignmentMode.ALIGN_END)
     .build()
 
 testData.setPreProcessor(normalizer)
