@@ -43,6 +43,12 @@ public class ModelServerDirectInferenceExample {
         // Initialize RestTemplate
         RestTemplate restTemplate = new RestTemplate();
 
+        if (textAsJson) {
+            List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
+            converters.add(new ExtendedMappingJackson2HttpMessageConverter());
+            restTemplate.setMessageConverters(converters);
+        }
+
         // Read each line
         String line = null;
         while ((line = br.readLine()) != null) {
@@ -70,12 +76,6 @@ public class ModelServerDirectInferenceExample {
                         new int[]{0, i};
 
                 array.putScalar(idx, d);
-            }
-
-            if (textAsJson) {
-                List<HttpMessageConverter<?>> converters = restTemplate.getMessageConverters();
-                converters.add(new ExtendedMappingJackson2HttpMessageConverter());
-                restTemplate.setMessageConverters(converters);
             }
 
             Inference.Request request = new Inference.Request(Nd4jBase64.base64String(array));
