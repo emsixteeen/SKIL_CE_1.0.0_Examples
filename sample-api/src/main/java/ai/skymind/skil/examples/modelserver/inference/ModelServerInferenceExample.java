@@ -7,7 +7,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.JCommander;
@@ -16,7 +15,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,8 +44,8 @@ public class ModelServerInferenceExample {
     @Parameter(names="--knn", description="Number of K Nearest Neighbors to return", required=false)
     private int knnN = 20;
 
-    @Parameter(names="--418", description="Temp Fix for DataVec#418", required=false)
-    private boolean fix418;
+    @Parameter(names="--textAsJson", description="Parse text/plain as JSON", required=false, arity=1)
+    private boolean textAsJson;
 
     public void run() throws Exception {
         final File file = new File(inputFile);
@@ -86,7 +84,7 @@ public class ModelServerInferenceExample {
                 transformRequest = new TransformedArray.Request(fields);
             }
 
-            if (fix418) {
+            if (textAsJson) {
                 // Accept JSON
                 requestHeaders.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
@@ -137,13 +135,5 @@ public class ModelServerInferenceExample {
           .parse(args);
 
         m.run();
-    }
-}
-
-class ExtendedMappingJackson2HttpMessageConverter extends MappingJackson2HttpMessageConverter {
-    public ExtendedMappingJackson2HttpMessageConverter() {
-        List<MediaType> types = new ArrayList<MediaType>(super.getSupportedMediaTypes());
-        types.add(new MediaType("text", "plain", DEFAULT_CHARSET));
-        super.setSupportedMediaTypes(types);
     }
 }

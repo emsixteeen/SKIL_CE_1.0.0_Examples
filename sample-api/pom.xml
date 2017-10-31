@@ -10,6 +10,9 @@
     <properties>
         <java.version>1.8</java.version>
         <junit.version>4.12</junit.version>
+        <nd4j.artifact>nd4j-native</nd4j.artifact>
+        <nd4j.version>0.9.1</nd4j.version>
+        <main.class>ai.skymind.skil.examples.modelserver.inference.Main</main.class>
     </properties>
 
     <dependencies>
@@ -32,6 +35,21 @@
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.72</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>${nd4j.artifact}</artifactId>
+            <version>${nd4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nd4j</groupId>
+            <artifactId>nd4j-base64</artifactId>
+            <version>${nd4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>${nd4j.version}</version>
         </dependency>
 
         <!-- Tests -->
@@ -56,10 +74,12 @@
                         <goals>
                             <goal>repackage</goal>
                         </goals>
+                        <configuration>
+                            <mainClass>${main.class}</mainClass>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>
