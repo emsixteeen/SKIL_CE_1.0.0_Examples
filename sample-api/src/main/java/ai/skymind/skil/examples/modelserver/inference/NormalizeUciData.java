@@ -50,6 +50,9 @@ public class NormalizeUciData {
                     String.format("cowardly refusing to overwrite output file %s", outputPath));
         }
 
+        System.out.format("downloading from %s\n", downloadUrl);
+        System.out.format("writing output to %s\n", outputPath);
+
         URL url = new URL(downloadUrl);
         String data = IOUtils.toString(url);
         String[] lines = data.split("\n");
@@ -93,8 +96,8 @@ public class NormalizeUciData {
             sb.append("\n");
         }
 
-        System.out.println(sb);
         FileUtils.write(outputFile, sb);
+        System.out.format("wrote normalized file to %s\n", outputPath);
     }
 
     public static void main(String... args) throws Exception {
