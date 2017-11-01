@@ -91,8 +91,8 @@ def downloadUCIData() {
         val transposed: String = line.replaceAll(" +", "\n")
         //Labels: first 100 are label 0, second 100 are label 1, and so on
 
-        contentAndLabels.add(new Pair(transposed, {
-            lineCount += 1; lineCount - 1 } / 100))
+        contentAndLabels.add(new Pair(transposed, (lineCount / 100)))
+        lineCount += 1
     }
 
     // Randomize and do a train/test split:
@@ -107,12 +107,12 @@ def downloadUCIData() {
         var outPathLabels: File = null
         if (trainCount < nTrain) {
             outPathFeatures = new File(featuresDirTrain, trainCount + ".csv")
-            outPathLabels = new File(labelsDirTrain, trainCount + ".csv") {
-                trainCount += 1; trainCount - 1 }
+            outPathLabels = new File(labelsDirTrain, trainCount + ".csv") 
+            trainCount += 1
         } else {
             outPathFeatures = new File(featuresDirTest, testCount + ".csv")
-            outPathLabels = new File(labelsDirTest, testCount + ".csv") {
-                testCount += 1; testCount - 1 }
+            outPathLabels = new File(labelsDirTest, testCount + ".csv")
+            testCount += 1
         }
 
         FileUtils.writeStringToFile(outPathFeatures, p.getFirst)
