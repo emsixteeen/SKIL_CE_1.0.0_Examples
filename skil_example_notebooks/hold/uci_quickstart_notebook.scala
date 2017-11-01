@@ -191,6 +191,7 @@ testData.setPreProcessor(normalizer)
 // Configure the network
 val conf: ComputationGraphConfiguration = new NeuralNetConfiguration.Builder()
     .seed(123)
+    .trainingWorkspaceMode(WorkspaceMode.SINGLE)
     .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
     .iterations(1)
     .weightInit(WeightInit.XAVIER)
@@ -203,7 +204,7 @@ val conf: ComputationGraphConfiguration = new NeuralNetConfiguration.Builder()
     .addLayer("lstm", new GravesLSTM.Builder().activation(Activation.TANH).nIn(1).nOut(10).build(), "input")
     .addVertex("pool", new LastTimeStepVertex("input"), "lstm")
     .addLayer("output", new OutputLayer.Builder(LossFunction.MCXENT)
-           .activation(Activation.SOFTMAX).nIn(10).nOut(numLabelClasses).build(), "pool")
+        .activation(Activation.SOFTMAX).nIn(10).nOut(numLabelClasses).build(), "pool")
     .setOutputs("output")
     .pretrain(false)
     .backprop(true)
@@ -212,16 +213,23 @@ val conf: ComputationGraphConfiguration = new NeuralNetConfiguration.Builder()
 val network_model: ComputationGraph = new ComputationGraph(conf)
 network_model.init()
 
+network_model.setListeners(new ScoreIterationListener(20))
+
 // Train the network, evaluating the test set performance at each step
 trainData.reset()
 testData.reset()
 
-val nEpochs: Int = 40
+val nEpochs: Int = 10
 
 for (i <- 0 until nEpochs) {
     network_model.fit(trainData)
 
     // Evaluate on the test set:
+    val roc = new ROCMultiClass()
+    val eval = new Evaluation()
+    network_model.doEvaluation(testData, roc);
+    println(roc.stats())
+
     val evaluation: Evaluation = network_model.evaluate(testData)
     var accuracy = evaluation.accuracy()
     var f1 = evaluation.f1()
