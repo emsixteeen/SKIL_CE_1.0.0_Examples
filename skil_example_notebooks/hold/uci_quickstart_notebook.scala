@@ -118,7 +118,7 @@ def downloadUCIData() {
         FileUtils.writeStringToFile(outPathFeatures, p.getFirst)
         FileUtils.writeStringToFile(outPathLabels, p.getSecond.toString)
     }
- }
+}
 
 // Download data as needed
 downloadUCIData()
@@ -181,7 +181,7 @@ testLabels.initialize(
 
 val testData: MultiDataSetIterator = new RecordReaderMultiDataSetIterator.Builder(minibatch)
     .addSequenceReader("features", testFeatures)
-    .addReader("labels", trainLabels)
+    .addReader("labels", testLabels)
     .addInput("features")
     .addOutputOneHot("labels", 0, numLabelClasses)
     .build()
