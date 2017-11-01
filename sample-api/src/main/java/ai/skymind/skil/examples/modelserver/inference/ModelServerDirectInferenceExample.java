@@ -56,7 +56,7 @@ public class ModelServerDirectInferenceExample {
             // Check if label indicator is up front
             String label = null;
             if (line.matches("^\\d:\\s.*")) {
-                label = line.substring(0);
+                label = line.substring(0, 1);
             }
 
             // Just in case
