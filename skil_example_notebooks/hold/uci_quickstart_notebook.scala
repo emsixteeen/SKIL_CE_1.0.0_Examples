@@ -35,6 +35,7 @@ import org.nd4j.linalg.primitives.Pair
 import org.nd4j.linalg.dataset.api.iterator.MultiDataSetIterator
 import org.nd4j.linalg.dataset.api.preprocessor.MultiDataNormalization
 import org.nd4j.linalg.dataset.api.preprocessor.MultiNormalizerStandardize
+import org.nd4j.linalg.util.ArrayUtil
 
 import java.io.File
 import java.net.URL
@@ -250,3 +251,18 @@ for (i <- 0 until nEpochs) {
 var evaluation = eval(testData)
 val modelId = skilContext.addModelToExperiment(z, network_model)
 val evalId = skilContext.addEvaluationToModel(z, modelId, evaluation)
+
+// Test one record (label should be 1)
+val record = Array(Array(Array(
+    -1.65, 1.38, 1.37, 2.56, 2.72, 0.64, 0.76, 0.45, -0.28, -2.72, -2.85, -2.27, -1.23, -1.42, 0.90,
+    1.81, 2.77, 1.12, 2.25, 1.26, -0.23, -0.27, -1.74, -1.90, -1.56, -1.35, -0.54, 0.41, 1.20, 1.59,
+    1.66, 0.75, 0.96, 0.07, -0.70, -0.32, -1.13, -0.77, -0.96, -0.55, 0.39, 0.56, 0.52, 0.98, 0.91,
+    0.23, -0.13, -0.31, -0.98, -0.73, -0.85, -0.77, -0.80, -0.04, 0.64, 0.77, 0.50, 0.98, 0.40, 0.24
+)))
+
+var flattened = ArrayUtil.flattenDoubleArray(record)
+var input = Nd4j.create(flattened, Array(1, 1, 60), 'c')
+var output = network_model.output(input)
+var label = Nd4j.argMax(output(0), -1)
+
+println(s"Label: $label")
