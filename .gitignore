@@ -27,3 +27,6 @@ target/
 # IntelliJ
 .idea
 *.iml
+
+# Mac stuff
+.DS_Store
