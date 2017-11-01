@@ -38,55 +38,124 @@ public class NormalizeUciData {
     @Parameter(names = "--normalizer", description = "Normalizer to use", required = false)
     private Normalizer dataNormalizer = Normalizer.Standardize;
 
-    @Parameter(names = "--output", description = "Where to write data to", required = false)
-    private String outputPath = "/tmp/synthetic_control.data-normalized.csv";
+    @Parameter(names = "--trainOutput", description = "Where to write data to", required = false)
+    private String trainOutputPath = "/tmp/synthetic_control.data-training-normalized.csv";
+
+    @Parameter(names = "--testOutput", description = "Where to write data to", required = false)
+    private String testOutputPath = "/tmp/synthetic_control.data-test-normalized.csv";
 
     public void run() throws Exception {
-        File outputFile = new File(outputPath);
-        if (outputFile.exists()) {
+        File trainingOutputFile = new File(trainOutputPath);
+        File testOutputFile = new File(testOutputPath);
+
+        if (trainingOutputFile.exists() || testOutputFile.exists()) {
             throw new IllegalStateException(
-                    String.format("cowardly refusing to overwrite output file %s", outputPath));
+                    String.format("cowardly refusing to overwrite output files (%s, %s)",
+                            trainOutputPath, testOutputPath));
         }
 
         System.out.format("downloading from %s\n", downloadUrl);
-        System.out.format("writing output to %s\n", outputPath);
+        System.out.format("writing training output to %s\n", trainOutputPath);
+        System.out.format("writing testing output to %s\n", testOutputPath);
 
         URL url = new URL(downloadUrl);
         String data = IOUtils.toString(url);
         String[] lines = data.split("\n");
-        INDArray array = Nd4j.zeros(lines.length, 60);
+        List<INDArray> arrays = new LinkedList<INDArray>();
+        List<Integer> labels = new LinkedList<Integer>();
 
-        for (int i=0; i<lines.length; i++ ) {
+        for (int i=0; i<lines.length; i++) {
             String line = lines[i];
-
             String[] cols = line.split("\\s+");
+
+            int label = i / 100;
+            INDArray array = Nd4j.zeros(1, 60);
+
             for (int j=0; j<cols.length; j++) {
                 Double d = Double.parseDouble(cols[j]);
-                array.putScalar(i, j, d);
+                array.putScalar(0, j, d);
+            }
+
+            arrays.add(array);
+            labels.add(label);
+        }
+
+        // Shuffle with **known** seed
+        Collections.shuffle(arrays, new Random(12345));
+        Collections.shuffle(labels, new Random(12345));
+
+        INDArray trainData = Nd4j.zeros(450, 60);
+        INDArray testData = Nd4j.zeros(150, 60);
+
+        for (int i=0; i<arrays.size(); i++) {
+            INDArray arr = arrays.get(i);
+
+            if (i < 450) { // Training
+                trainData.putRow(i, arr);
+            } else { // Test
+                testData.putRow(i-450, arr);
             }
         }
 
-        DataSet ds = new DataSet(array, array);
-        DataSetIterator it = new ListDataSetIterator(ds.asList());
-        DataNormalization normalizer = dataNormalizer.getNormalizer();
+        DataSet trainDs = new DataSet(trainData, trainData);
+        DataSetIterator trainIt = new ListDataSetIterator(trainDs.asList());
 
-        normalizer.fit(it);
-        it.setPreProcessor(normalizer);
+        DataSet testDs = new DataSet(testData, testData);
+        DataSetIterator testIt = new ListDataSetIterator(testDs.asList());
+
+        // Fit normalizer on training data only!
+        DataNormalization normalizer = dataNormalizer.getNormalizer();
+        normalizer.fit(trainIt);
+
+        // Print out basic summary stats
+        switch (normalizer.getType()) {
+            case STANDARDIZE:
+                System.out.format("Normalizer - Standardize:\n  mean=%s\n  std= %s\n",
+                        ((NormalizerStandardize)normalizer).getMean(),
+                        ((NormalizerStandardize)normalizer).getStd());
+        }
+
+        // Use same normalizer for both
+        trainIt.setPreProcessor(normalizer);
+        testIt.setPreProcessor(normalizer);
+
+        String trainOutput = toCsv(trainIt, labels.subList(0, 450), new int[]{1, 60});
+        String testOutput = toCsv(testIt, labels.subList(450, 600), new int[]{1, 60});
+
+        FileUtils.write(trainingOutputFile, trainOutput);
+        System.out.format("wrote normalized training file to %s\n", trainingOutputFile);
+
+        FileUtils.write(testOutputFile, testOutput);
+        System.out.format("wrote normalized test file to %s\n", testOutputFile);
+
+    }
+
+    private String toCsv(DataSetIterator it, List<Integer> labels, int[] shape) {
+        if (it.numExamples() != labels.size()) {
+            throw new IllegalStateException(
+                    String.format("numExamples == %d != labels.size() == %d",
+                            it.numExamples(), labels.size()));
+        }
 
         StringBuffer sb = new StringBuffer();
+        int l = 0;
 
         while (it.hasNext()) {
             INDArray features = it.next(1).getFeatures();
-            int[] shape = features.shape();
 
-            if (!(shape[0] == 1 && shape[1] == 60)) {
-                throw new IllegalStateException(String.format("wrong shape: %s", Arrays.toString(shape)));
+            if (!(Arrays.equals(features.shape(), shape))) {
+                throw new IllegalStateException(String.format("wrong shape: got %s, expected",
+                        Arrays.toString(features.shape()), Arrays.toString(shape)));
             }
 
-            for (int i=0; i<60; i++) {
+            // Prepend the label
+            sb.append(labels.get(l)).append(": ");
+            l++;
+
+            for (int i=0; i<features.columns(); i++) {
                 sb.append(features.getColumn(i));
 
-                if (i < 59) {
+                if (i < features.columns()-1) {
                     sb.append(", ");
                 }
             }
@@ -94,9 +163,9 @@ public class NormalizeUciData {
             sb.append("\n");
         }
 
-        FileUtils.write(outputFile, sb);
-        System.out.format("wrote normalized file to %s\n", outputPath);
+        return sb.toString();
     }
+
 
     public static void main(String... args) throws Exception {
         NormalizeUciData m = new NormalizeUciData();
