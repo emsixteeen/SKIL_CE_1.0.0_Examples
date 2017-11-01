@@ -158,6 +158,10 @@ def makeNormalizer( mds:MultiDataSetIterator ) : MultiNormalizerStandardize = {
 }
 
 val normalizer = makeNormalizer(trainData)
+val mean = normalizer.getFeatureMean(0)
+val std = normalizer.getFeatureStd(0)
+
+println(s"Mean: $mean, Std: $std")
 
 // Use previously collected statistics to normalize on-the-fly
 trainData.setPreProcessor(normalizer)
