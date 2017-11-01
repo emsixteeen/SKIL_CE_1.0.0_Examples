@@ -18,6 +18,9 @@ import java.util.*;
 
 public class NormalizeUciData {
 
+    public static final String DEFAULT_TRAIN_OUTPUT = "/tmp/synthetic_control.data-training-normalized.csv";
+    public static final String DEFAULT_TEST_OUTPUT = "/tmp/synthetic_control.data-test-normalized.csv";
+
     private enum Normalizer {
         Standardize (new NormalizerStandardize());
 
@@ -39,10 +42,10 @@ public class NormalizeUciData {
     private Normalizer dataNormalizer = Normalizer.Standardize;
 
     @Parameter(names = "--trainOutput", description = "Where to write data to", required = false)
-    private String trainOutputPath = "/tmp/synthetic_control.data-training-normalized.csv";
+    private String trainOutputPath = DEFAULT_TRAIN_OUTPUT;
 
     @Parameter(names = "--testOutput", description = "Where to write data to", required = false)
-    private String testOutputPath = "/tmp/synthetic_control.data-test-normalized.csv";
+    private String testOutputPath = DEFAULT_TEST_OUTPUT;
 
     public void run() throws Exception {
         File trainingOutputFile = new File(trainOutputPath);
