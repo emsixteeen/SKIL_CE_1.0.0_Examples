@@ -9,19 +9,17 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
-import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.*;
 
 public class NormalizeUciData {
 
     private enum Normalizer {
-        Standardize (new NormalizerStandardize()),
-        MinMax (new NormalizerMinMaxScaler());
+        Standardize (new NormalizerStandardize());
 
         private DataNormalization normalizer;
 
