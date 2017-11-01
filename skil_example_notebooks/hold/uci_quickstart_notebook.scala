@@ -230,7 +230,7 @@ def eval(it:MultiDataSetIterator) : Evaluation = {
 trainData.reset()
 testData.reset()
 
-val nEpochs: Int = 10
+val nEpochs: Int = 40
 
 for (i <- 0 until nEpochs) {
     network_model.fit(trainData)
