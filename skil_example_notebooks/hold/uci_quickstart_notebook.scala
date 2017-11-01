@@ -12,7 +12,7 @@ import org.deeplearning4j.nn.graph._
 import org.deeplearning4j.nn.conf._
 import org.deeplearning4j.nn.conf.inputs._
 import org.deeplearning4j.nn.conf.layers._
-import org.deeplearning4j.nn.conf.layers._
+import org.deeplearning4j.nn.conf.graph.rnn.LastTimeStepVertex
 import org.deeplearning4j.nn.weights._
 import org.deeplearning4j.optimize.listeners._
 import org.deeplearning4j.api.storage.impl.RemoteUIStatsStorageRouter
@@ -95,7 +95,7 @@ def downloadUCIData() {
             lineCount += 1; lineCount - 1 } / 100))
     }
 
-    //Randomize and do a train/test split:
+    // Randomize and do a train/test split:
     Collections.shuffle(contentAndLabels, new Random(12345))
 
     //75% train, 25% test
@@ -148,16 +148,18 @@ val trainData: MultiDataSetIterator = new RecordReaderMultiDataSetIterator.Build
     .build()
 
 // Normalize the training data
-var normalizer: MultiDataNormalization = null
-{
-    normalizer = new MultiNormalizerStandardize()
+def makeNormalizer( mds:MultiDataSetIterator ) : MultiNormalizerStandardize = {
+    val n = new MultiNormalizerStandardize()
 
     // Collect training data statistics
-    normalizer.fit(trainData)
-    trainData.reset()
+    n.fit(mds)
+    mds.reset()
+    return n
 }
 
-//Use previously collected statistics to normalize on-the-fly
+val normalizer = makeNormalizer(trainData)
+
+// Use previously collected statistics to normalize on-the-fly
 trainData.setPreProcessor(normalizer)
 
 // Load the test data
@@ -183,40 +185,39 @@ val testData: MultiDataSetIterator = new RecordReaderMultiDataSetIterator.Builde
 testData.setPreProcessor(normalizer)
 
 // Configure the network
-val conf: MultiLayerConfiguration = new NeuralNetConfiguration.Builder()
+val conf: ComputationGraphConfiguration = new NeuralNetConfiguration.Builder()
     .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
     .iterations(1)
-    //.updater(Updater.NESTEROVS)
-    .updater(new Nesterovs(0.006, 0.9))
-    //.momentum(0.9)
-    //.learningRate(0.005)
-    .gradientNormalization(
-        GradientNormalization.ClipElementWiseAbsoluteValue)
+    .weightInit(WeightInit.XAVIER)
+    .updater(new Nesterovs(0.005, 0.9))
+    .gradientNormalization(GradientNormalization.ClipElementWiseAbsoluteValue)
     .gradientNormalizationThreshold(0.5)
-    .list()
-    .layer(0, new GravesLSTM.Builder().activation(Activation.TANH).nIn(1).nOut(10).build())
-    .layer(1, new GlobalPoolingLayer.Builder(PoolingType.MAX).build())
-    .layer(2, new OutputLayer.Builder(LossFunction.MCXENT)
-           .activation(Activation.SOFTMAX)
-           .nIn(10)
-           .nOut(numLabelClasses)
-           .build())
+    .graphBuilder()
+    .addInputs("input")
+    .setInputTypes(InputType.recurrent(1))
+    .addLayer("lstm", new GravesLSTM.Builder().activation(Activation.TANH).nIn(1).nOut(10).build(), "input")
+    .addVertex("pool", new LastTimeStepVertex("input"), "lstm")
+    .addLayer("output", new OutputLayer.Builder(LossFunction.MCXENT)
+           .activation(Activation.SOFTMAX).nIn(10).nOut(numLabelClasses).build(), "pool")
+    .setOutputs("output")
     .pretrain(false)
     .backprop(true)
     .build()
 
-val network_model: MultiLayerNetwork = new MultiLayerNetwork(conf)
+val network_model: ComputationGraph = new ComputationGraph(conf)
 network_model.init()
-//net.setListeners(new ScoreIterationListener(20))
 
 // Train the network, evaluating the test set performance at each step
-val nEpochs: Int = 2
+trainData.reset()
+testData.reset()
+
+val nEpochs: Int = 40
 
 for (i <- 0 until nEpochs) {
     network_model.fit(trainData)
 
     // Evaluate on the test set:
-    val evaluation: Evaluation = network_model.doEvaluation(testData, new Evaluation(numLabelClasses))(0)
+    val evaluation: Evaluation = network_model.evaluate(testData)
     var accuracy = evaluation.accuracy()
     var f1 = evaluation.f1()
 
@@ -227,6 +228,6 @@ for (i <- 0 until nEpochs) {
 }
 
 // Save Model
-var evaluation = network_model.doEvaluation(testData, new Evaluation(numLabelClasses))(0)
+var evaluation = network_model.evaluate(testData)
 val modelId = skilContext.addModelToExperiment(z, network_model)
 val evalId = skilContext.addEvaluationToModel(z, modelId, evaluation)
