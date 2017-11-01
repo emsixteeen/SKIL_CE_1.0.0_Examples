@@ -190,6 +190,7 @@ testData.setPreProcessor(normalizer)
 
 // Configure the network
 val conf: ComputationGraphConfiguration = new NeuralNetConfiguration.Builder()
+    .seed(123)
     .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
     .iterations(1)
     .weightInit(WeightInit.XAVIER)
