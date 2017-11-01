@@ -107,7 +107,7 @@ def downloadUCIData() {
         var outPathLabels: File = null
         if (trainCount < nTrain) {
             outPathFeatures = new File(featuresDirTrain, trainCount + ".csv")
-            outPathLabels = new File(labelsDirTrain, trainCount + ".csv") 
+            outPathLabels = new File(labelsDirTrain, trainCount + ".csv")
             trainCount += 1
         } else {
             outPathFeatures = new File(featuresDirTest, testCount + ".csv")
@@ -191,7 +191,6 @@ testData.setPreProcessor(normalizer)
 // Configure the network
 val conf: ComputationGraphConfiguration = new NeuralNetConfiguration.Builder()
     .seed(123)
-    .trainingWorkspaceMode(WorkspaceMode.SINGLE)
     .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
     .iterations(1)
     .weightInit(WeightInit.XAVIER)
@@ -204,7 +203,7 @@ val conf: ComputationGraphConfiguration = new NeuralNetConfiguration.Builder()
     .addLayer("lstm", new GravesLSTM.Builder().activation(Activation.TANH).nIn(1).nOut(10).build(), "input")
     .addVertex("pool", new LastTimeStepVertex("input"), "lstm")
     .addLayer("output", new OutputLayer.Builder(LossFunction.MCXENT)
-        .activation(Activation.SOFTMAX).nIn(10).nOut(numLabelClasses).build(), "pool")
+           .activation(Activation.SOFTMAX).nIn(10).nOut(numLabelClasses).build(), "pool")
     .setOutputs("output")
     .pretrain(false)
     .backprop(true)
