@@ -212,7 +212,19 @@ val conf: ComputationGraphConfiguration = new NeuralNetConfiguration.Builder()
 val network_model: ComputationGraph = new ComputationGraph(conf)
 network_model.init()
 
-network_model.setListeners(new ScoreIterationListener(20))
+def eval(it:MultiDataSetIterator) : Evaluation = {
+    val evaluation = new Evaluation(numLabelClasses)
+
+    it.reset()
+    while (it.hasNext()) {
+        val ds = it.next()
+        val prediction = network_model.outputSingle(ds.getFeatures(0))
+
+        evaluation.eval(ds.getLabels(0), prediction)
+    }
+
+    return evaluation
+}
 
 // Train the network, evaluating the test set performance at each step
 trainData.reset()
@@ -224,12 +236,7 @@ for (i <- 0 until nEpochs) {
     network_model.fit(trainData)
 
     // Evaluate on the test set:
-    val roc = new ROCMultiClass()
-    val eval = new Evaluation()
-    network_model.doEvaluation(testData, roc);
-    println(roc.stats())
-
-    val evaluation: Evaluation = network_model.evaluate(testData)
+    val evaluation = eval(testData)
     var accuracy = evaluation.accuracy()
     var f1 = evaluation.f1()
 
@@ -240,6 +247,6 @@ for (i <- 0 until nEpochs) {
 }
 
 // Save Model
-var evaluation = network_model.evaluate(testData)
+var evaluation = eval(testData)
 val modelId = skilContext.addModelToExperiment(z, network_model)
 val evalId = skilContext.addEvaluationToModel(z, modelId, evaluation)
