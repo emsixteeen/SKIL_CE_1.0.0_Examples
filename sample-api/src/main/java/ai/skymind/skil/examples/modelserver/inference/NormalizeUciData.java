@@ -2,6 +2,7 @@ package ai.skymind.skil.examples.modelserver.inference;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.deeplearning4j.datasets.iterator.impl.ListDataSetIterator;
@@ -13,13 +14,17 @@ import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URL;
 import java.util.*;
 
 public class NormalizeUciData {
 
     public static final String DEFAULT_TRAIN_OUTPUT = "/tmp/synthetic_control.data-training-normalized.csv";
+    private static final String DEFAULT_TRAIN_SHA1 = "6b5134778cfea12cfe5f463db904bb89aff7a1ec";
+
     public static final String DEFAULT_TEST_OUTPUT = "/tmp/synthetic_control.data-test-normalized.csv";
+    private static final String DEFAULT_TEST_SHA1 = "74177e3b9688344785e7585c596235ae7d84a368";
 
     private enum Normalizer {
         Standardize (new NormalizerStandardize());
@@ -52,9 +57,24 @@ public class NormalizeUciData {
         File testOutputFile = new File(testOutputPath);
 
         if (trainingOutputFile.exists() || testOutputFile.exists()) {
-            throw new IllegalStateException(
-                    String.format("cowardly refusing to overwrite output files (%s, %s)",
-                            trainOutputPath, testOutputPath));
+            final FileInputStream fisTrain = new FileInputStream(trainingOutputFile);
+            final FileInputStream fisTest = new FileInputStream(testOutputFile);
+
+            final String trainSha1 = DigestUtils.sha1Hex(fisTrain);
+            final String testSha1 = DigestUtils.sha1Hex(fisTest);
+
+            fisTrain.close();
+            fisTest.close();
+
+            if (!(trainSha1.equals(DEFAULT_TRAIN_SHA1) && testSha1.equals(DEFAULT_TEST_SHA1))) {
+                throw new IllegalStateException(
+                        String.format("cowardly refusing to overwrite output files (%s, %s)",
+                                trainOutputPath, testOutputPath));
+            }
+
+            // They match, so tell the user
+            System.out.format("output files already found, and have matching checksums, keeping as is\n");
+            return;
         }
 
         System.out.format("downloading from %s\n", downloadUrl);
